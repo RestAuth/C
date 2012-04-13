@@ -1,0 +1,9 @@
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/FindModules) 
+find_package(CURL REQUIRED)
+find_package(JSON REQUIRED)
+configure_file(opts.h.in opts.h)
+add_library(librestauth SHARED)
+target_link_libraries(librestauth ${CURL_LIBRARIES} ${JSON_LIBRARIES})
+
+install(TARGETS librestauth LIBRARY DESTINATION lib)
+install(TARGETS restauth.h PUBLIC_HEADER DESTINATION include)
