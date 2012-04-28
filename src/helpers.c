@@ -12,15 +12,21 @@
 #include <curl/curl.h>
 #include "helpers.h"
 
+//Dummy function. Doesn't do anything. Used to prevent CURL from writing to stdout
+static int ra_callback_func(char * msg, int size, int num, void* data) {
+	return size*num;
+}
+
 CURL * ra_init_curl(const RA_CON * con) {
 	CURL * curl_p = curl_easy_init();
 	curl_easy_setopt(curl_p, CURLOPT_USE_SSL, CURLUSESSL_TRY);
+	curl_easy_setopt(curl_p, CURLOPT_WRITEFUNCTION, &ra_callback_func);
 
 	curl_easy_setopt(curl_p, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 	curl_easy_setopt(curl_p, CURLOPT_USERNAME, con->username);
 	curl_easy_setopt(curl_p, CURLOPT_PASSWORD, con->password);
-	char * userpwd = malloc(strlen(con->username)+strlen(con->password)+1);
-	sprintf(userpwd, "%s%s", con->username, con->password);
+	char * userpwd = malloc(strlen(con->username)+strlen(con->password)+2);
+	sprintf(userpwd, "%s:%s", con->username, con->password);
 	curl_easy_setopt(curl_p, CURLOPT_USERPWD, userpwd);
 	free(userpwd);
 	return curl_p;
