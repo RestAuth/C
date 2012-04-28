@@ -1,7 +1,6 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/FindModules) 
 find_package(CURL REQUIRED)
 find_package(JSON REQUIRED)
-configure_file(opts.h.in opts.h)
 add_library(restauth SHARED restauth.c helpers.c)
 target_link_libraries(restauth ${CURL_LIBRARIES} ${JSON_LIBRARIES})
 
