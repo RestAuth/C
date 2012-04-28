@@ -12,6 +12,7 @@
 #include "restauth.h"
 
 CURL * ra_init_curl(const RA_CON *);
+char * ra_str_escape(const char *);
 void ra_curl_error(CURLcode);
 void ra_error(int);
 
