@@ -8,8 +8,6 @@
 #=============================================================================
 # Copyright 2012 Gabriel Pickl.
 #
-# Distributed under the OSI-approved BSD License (the "License");
-#
 # This software is distributed WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
@@ -27,7 +25,7 @@ MARK_AS_ADVANCED(JSON_LIBRARY)
 
 # handle the QUIETLY and REQUIRED arguments and set CURL_FOUND to TRUE if 
 # all listed variables are TRUE
-INCLUDE(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+INCLUDE(/usr/share/cmake-2.8/Modules/FindPackageHandleStandardArgs.cmake)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(JSON DEFAULT_MSG JSON_LIBRARY JSON_INCLUDE_DIR)
 
 IF(JSON_FOUND)
