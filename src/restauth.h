@@ -19,6 +19,7 @@ typedef char ra_bool;
 extern void ra_global_init();
 extern RA_CON * ra_init(const char * address, const char * username, const char * password);
 extern void ra_cleanup(RA_CON*);
+extern int ra_check_server(RA_CON*);
 
 extern int ra_auth(const RA_CON *, const char * user, const char * password);
 extern int ra_list_users(const RA_CON *, char ** userlist);

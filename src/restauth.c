@@ -39,28 +39,33 @@ void ra_cleanup(RA_CON * con) {
 	free(con);
 }
 
+int ra_check_server(RA_CON * con) {
+	CURL * session = ra_init_curl(con);
+
+}
+
 int ra_auth(const RA_CON * con, const char * user, const char * password) {
 	CURL * session = ra_init_curl(con);
-	char * address = malloc(strlen(con->address)+strlen(USER_PATH)+strlen(user)+1);
-	sprintf(address, "%s%s%s", con->address, USER_PATH, user);
+	char * address = malloc(strlen(con->address)+strlen(USER_PATH)+strlen(user)+2);
+	sprintf(address, "%s%s%s/", con->address, USER_PATH, user);
 	curl_easy_setopt(session, CURLOPT_URL, address);
 	free(address);
 
 	char * post_data = malloc(strlen(PASSWORD_PREFIX)+strlen(password)+1);
 	sprintf(post_data, "%s%s", PASSWORD_PREFIX, password);
-	char * esc_post_data = ra_str_escape(post_data);
-	free(post_data);
-	curl_easy_setopt(session, CURLOPT_POSTFIELDS, esc_post_data);
-	free(esc_post_data);
+	curl_easy_setopt(session, CURLOPT_POSTFIELDS, post_data);
 
 	CURLcode err = curl_easy_perform(session);
+	free(post_data);
 
 	if(err != 0) {
-		ar_curl_error(err);
+		ra_curl_error(err);
+		curl_easy_cleanup(session);
 		return -1;
 	}
 	long response;
 	curl_easy_getinfo(session, CURLINFO_RESPONSE_CODE, &response);
+	curl_easy_cleanup(session);
 	switch(response) {
 	case 204:
 		return 1;
