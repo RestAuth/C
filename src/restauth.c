@@ -10,6 +10,7 @@
 #define PASSWORD_PREFIX "password="
 
 #include <curl/curl.h>
+#include <jansson.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -88,6 +89,42 @@ int ra_user_in_group(const RA_CON * con, const char * user, const char * group) 
 	free(address);
 
 	CURLcode err = curl_easy_perform(session);
+
+	if(err != 0) {
+		ra_curl_error(err);
+		curl_easy_cleanup(session);
+		return -1;
+	}
+	long response;
+	curl_easy_getinfo(session, CURLINFO_RESPONSE_CODE, &response);
+	curl_easy_cleanup(session);
+	switch(response) {
+		case 204:
+			return 1;
+		case 404:
+			return 0;
+		default:
+			ra_error(response);
+			return -1;
+	}
+}
+
+int ra_change_pw(const RA_CON * con, const char* user, const char* password) {
+	CURL * session = ra_init_curl(con);
+	char * address = malloc(strlen(con->address)+strlen(USER_PATH)+strlen(user)+2);
+	sprintf(address, "%s%s%s/", con->address, USER_PATH, user);
+	curl_easy_setopt(session, CURLOPT_URL, address);
+	free(address);
+	
+	char * put_data = malloc(strlen(PASSWORD_PREFIX)+strlen(password)+1);
+	sprintf(put_data, "%s%s", PASSWORD_PREFIX, password);
+
+	curl_easy_setopt(session, CURLOPT_UPLOAD, 1);
+	curl_easy_setopt(session, CURLOPT_READDATA, put_data);
+	curl_easy_setopt(session, CURLOPT_INFILESIZE, strlen(put_data));
+
+	CURLcode err = curl_easy_perform(session);
+	free(put_data);
 
 	if(err != 0) {
 		ra_curl_error(err);
