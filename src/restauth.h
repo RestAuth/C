@@ -12,6 +12,8 @@ struct ra_struct {
 	char * address;
 	char * username;
 	char * password;
+    char * sslcert;
+    int checkssl;
 };
 typedef struct ra_struct RA_CON;
 typedef char ra_bool;
@@ -24,7 +26,7 @@ extern int ra_check_server(RA_CON*);
 extern int ra_auth(const RA_CON *, const char * user, const char * password);
 extern int ra_list_users(const RA_CON *, char ** userlist);
 extern int ra_user_exists(const RA_CON *, const char * user);
-extern int ra_user_in_group(const RA_CON *, const char * user, const char * password);
+extern int ra_user_in_group(const RA_CON *, const char * user, const char * group);
 extern int ra_user_get_groups(const RA_CON*, const char * user, char ** grouplist);
 
 extern int ra_create_user(const RA_CON *, const char * user);

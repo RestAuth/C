@@ -6,6 +6,7 @@
  */
 
 #define USER_PATH "/users/"
+#define GROUP_PATH "/groups/"
 #define PASSWORD_PREFIX "password="
 
 #include <curl/curl.h>
@@ -28,6 +29,8 @@ RA_CON * ra_init(const char * address, const char * username, const char * passw
 	strcpy(con->address, address);
 	strcpy(con->username, username);
 	strcpy(con->password, password);
+
+	con->checkssl = 1;
 
 	return con;
 }
@@ -74,5 +77,33 @@ int ra_auth(const RA_CON * con, const char * user, const char * password) {
 	default:
 		ra_error(response);
 		return -1;
+	}
+}
+
+int ra_user_in_group(const RA_CON * con, const char * user, const char * group) {
+	CURL * session = ra_init_curl(con);
+	char * address = malloc(strlen(con->address)+strlen(GROUP_PATH)+strlen(group)+strlen(USER_PATH)+strlen(user)+2);
+	sprintf(address, "%s%s%s%s%s/", con->address, GROUP_PATH, group, USER_PATH, user);
+	curl_easy_setopt(session, CURLOPT_URL, address);
+	free(address);
+
+	CURLcode err = curl_easy_perform(session);
+
+	if(err != 0) {
+		ra_curl_error(err);
+		curl_easy_cleanup(session);
+		return -1;
+	}
+	long response;
+	curl_easy_getinfo(session, CURLINFO_RESPONSE_CODE, &response);
+	curl_easy_cleanup(session);
+	switch(response) {
+		case 204:
+			return 1;
+		case 404:
+			return 0;
+		default:
+			ra_error(response);
+			return -1;
 	}
 }
