@@ -21,6 +21,7 @@ CURL * ra_init_curl(const RA_CON * con) {
 	CURL * curl_p = curl_easy_init();
 	curl_easy_setopt(curl_p, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 	curl_easy_setopt(curl_p, CURLOPT_WRITEFUNCTION, &ra_callback_func);
+	curl_easy_setopt(curl_p, CURLOPT_READFUNCTION, &ra_curl_read);
 
 	curl_easy_setopt(curl_p, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 	curl_easy_setopt(curl_p, CURLOPT_USERNAME, con->username);
@@ -30,6 +31,16 @@ CURL * ra_init_curl(const RA_CON * con) {
 	curl_easy_setopt(curl_p, CURLOPT_USERPWD, userpwd);
 	free(userpwd);
 	return curl_p;
+}
+
+size_t ra_curl_read(void * ptr, size_t size, size_t nmemb, void * userdata) {
+	char * data = (char *)userdata;
+	char * target = (char *)ptr;
+	int i;
+	for(i = 0; i < size; i++) {
+		*(target+i) = *(data+i);
+	}
+	return size;
 }
 
 char * ra_str_escape(const char * str) {
